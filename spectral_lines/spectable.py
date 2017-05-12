@@ -5,6 +5,8 @@ from astropy.io import fits
 from astropy.table import Table
 from astropy.table import Column
 from astropy import wcs
+import warnings
+warnings.simplefilter('ignore', wcs.FITSFixedWarning)
 
 def get_axis(header):
     """
