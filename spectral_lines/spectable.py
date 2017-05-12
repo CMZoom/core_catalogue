@@ -84,7 +84,7 @@ def make_table(region, maskfile, linelist):
         axis = axis[0]/1000.0 # km/s 
 
         # Retrieve all the structure ids from the mask
-        structids = list(set(mask[np.where(mask >= 0.0)]))
+        structids = list(set(mask[mask >= 0.0]))
         # Prime the table to store the information
         table = generate_table(data_cube, axis, structids)
         # Prime the output file
