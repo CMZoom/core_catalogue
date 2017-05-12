@@ -27,3 +27,8 @@ plot_scml.py
 ------------
 
 Will plot multiple spatially-averaged spectra extracted from a core.
+
+plot_mcsl.py
+------------
+
+Will plot spatially-averaged spectra extracted from all cores.
