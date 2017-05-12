@@ -17,3 +17,13 @@ a .fits file. The 0th column in the table is the velocity and each subsequent
 column corresponds to an identified strucuture and gives the mean_flux in each
 channel. Note that in script_to_make_table_of_spectra.py I have added some lines
 of code that could be used if you want to loop over a number of regions.
+
+plot_scsl.py
+------------
+
+Will plot the spatially-averaged spectrum of a given line extracted from a core.
+
+plot_scml.py
+------------
+
+Will plot multiple spatially-averaged spectra extracted from a core.

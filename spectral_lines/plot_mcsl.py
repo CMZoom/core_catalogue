@@ -1,6 +1,5 @@
-# Simple plot. Will plot the spatially-averaged spectra corresponding to
-# multiple spectral lines, but for a single core.
-# Note - this will also work for a single line.
+# Simple plot. Will plot the spatially-averaged spectra for a single line for
+# each core in a particular region.
 #
 #
 
@@ -13,14 +12,14 @@ from matplotlib.pyplot import cm
 
 table_dir = "/Users/Jonathan/Dropbox/Work/CMZ/CMZ_SMA/output_spec/"
 region = "G0.489+0.010"
-linelist = ['C18O', 'C18O']
+linelist = ['C18O']
 
 table = Table.read(table_dir+region+".cube."+linelist[0]+".clean.table.fits")
 
 # Get a list of all available structure indices
 indices = table.colnames
 indices.pop(0)
-indices = np.array([int(val) for val in indices])
+indices = [int(val) for val in indices]
 print "Structure indices: ", indices
 
 structure_to_plot = indices[0] # change this number
@@ -36,22 +35,21 @@ maxy = np.max(y_axis)+stddev_y_axis
 # Plotting
 fig   = plt.figure(figsize=( 8.0, 8.0))
 ax = fig.add_subplot(111)
-fig.suptitle(str(structure_to_plot), fontsize=20)
+fig.suptitle(linelist[0], fontsize=20)
 ax.set_xlabel('Velocity  [km/s]')
 ax.set_ylabel('Mean flux [Jy/beam]')
 ax.set_xlim([np.min(x_axis),np.max(x_axis)])
-plt.plot(x_axis, y_axis, 'k-', drawstyle='steps', label=linelist[0])
+plt.plot(x_axis, y_axis, 'k-', drawstyle='steps', label=str(structure_to_plot))
 
-if len(linelist) > 1.0:
+if len(indices) > 1.0:
 
     # Generate a new colour for each line
-    n = len(linelist)
+    n = len(indices)
     colour=iter(cm.rainbow(np.linspace(0,1,n)))
 
-    for i in range(len(linelist)-1):
+    for i in range(len(indices)-1):
         c=next(colour)
-        # Read in the new table
-        table = Table.read(table_dir+region+".cube."+linelist[i+1]+".clean.table.fits")
+        structure_to_plot = indices[i+1] # change this number
         # Identify the same structure
         y_axis = np.array([val for val in table[str(structure_to_plot)]])
         # Calculate the y range - set the ylimits to their maximum values
@@ -64,8 +62,9 @@ if len(linelist) > 1.0:
             maxy = _maxy
 
         # Overplot the new line
-        plt.plot(x_axis, y_axis, color = c, linestyle='-', drawstyle='steps', label=linelist[i+1])
+        plt.plot(x_axis, y_axis, color = c, linestyle='-', drawstyle='steps', label=str(structure_to_plot))
 
+# Create a legend
 legend = ax.legend(loc='upper left', numpoints=1, borderpad=1., markerscale=8,frameon=False, ncol=2)
 for label in legend.get_texts():
     label.set_fontsize(10)

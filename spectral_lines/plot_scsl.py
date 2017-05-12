@@ -19,7 +19,7 @@ indices.pop(0)
 indices = np.array([int(val) for val in indices])
 print "Structure indices: ", indices
 
-structure_to_plot = indices[4] # change this number
+structure_to_plot = indices[0] # change this number
 
 # Plot information - update y_axis for different structure
 x_axis = np.array([val for val in table['Velocity']])
@@ -30,10 +30,18 @@ stddev_y_axis = np.std(y_axis)
 # Plotting
 fig   = plt.figure(figsize=( 8.0, 8.0))
 ax = fig.add_subplot(111)
+fig.suptitle(linelist[0], fontsize=20)
 ax.set_xlabel('Velocity  [km/s]')
 ax.set_ylabel('Mean flux [Jy/beam]')
 ax.set_xlim([np.min(x_axis),np.max(x_axis)])
 ax.set_ylim([np.min(y_axis)-stddev_y_axis,np.max(y_axis)+stddev_y_axis])
-plt.plot(x_axis, y_axis, 'k-', drawstyle='steps')
+plt.plot(x_axis, y_axis, 'k-', drawstyle='steps', label=str(structure_to_plot))
+
+# Create a legend
+legend = ax.legend(loc='upper left', numpoints=1, borderpad=1., markerscale=8,frameon=False, ncol=2)
+for label in legend.get_texts():
+    label.set_fontsize(10)
+for label in legend.get_lines():
+    label.set_linewidth(2.5)  # the legend line width
 
 plt.show()
