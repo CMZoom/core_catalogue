@@ -8,7 +8,7 @@ from astropy import wcs
 
 def get_axis(header):
     """
-    Generate & return the velocity axis from the fits header. 
+    Generate & return the velocity axis from the fits header.
     """
     mywcs = wcs.WCS(header)
     specwcs = mywcs.sub([wcs.WCSSUB_SPECTRAL])
@@ -80,7 +80,8 @@ def make_table(region, maskfile, linelist):
         hdu.close()
         cube = np.squeeze(cube)
         # Generate the velocity axis
-        axis = get_axis(cubehead)/1000.0 # km/s
+        axis = get_axis(cubehead)
+        axis = axis[0]/1000.0 # km/s 
 
         # Retrieve all the structure ids from the mask
         structids = list(set(mask[np.where(mask >= 0.0)]))
