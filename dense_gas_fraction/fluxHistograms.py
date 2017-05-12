@@ -9,16 +9,18 @@ import math
 ###   Read in FITS files:
     
 ###   This one is used to make the mask
-G1602 = fits.open('/Users/hph/Documents/FITS_Images/G1602_regrid.fits')
+path='/Users/hph/Documents/FITS_Images/'
+
+G1602 = fits.open(path+'G1602_regrid.fits')
 
 ###   The following four are masked and then plotted as histograms.
-GCMosaic250 = fits.open('/Users/hph/Documents/FITS_Images/gcmosaic_250um.fits')
+GCMosaic250 = fits.open(path+'gcmosaic_250um.fits')
 
-GCMosaic70 = fits.open('/Users/hph/Documents/FITS_Images/gcmosaic_70um.fits')
+GCMosaic70 = fits.open(path+'gcmosaic_70um.fits')
 
-GCMosaic24 = fits.open('/Users/hph/Documents/FITS_Images/gcmosaic_24um.fits')
+GCMosaic24 = fits.open(path+'gcmosaic_24um.fits')
 
-GCMosaic8 = fits.open('/Users/hph/Documents/FITS_Images/gcmosaic_8um.fits')
+GCMosaic8 = fits.open(path+'gcmosaic_8um.fits')
 
 print "FITS files loaded!"
 
