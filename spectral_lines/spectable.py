@@ -4,18 +4,15 @@ import numpy as np
 from astropy.io import fits
 from astropy.table import Table
 from astropy.table import Column
+from astropy import wcs
 
 def get_axis(header):
     """
-    Generate & return the velocity axis from the fits header. 
+    Generate & return the velocity axis from the fits header.
     """
-    cdelt = header['CDELT3']
-    naxis = header['NAXIS3']
-    crpix = header['CRPIX3']
-    crval = header['CRVAL3']
-    rangevals = (np.array(range(naxis))*1.0)+1.0
-    axis = (cdelt*(rangevals-crpix))+crval
-    return axis
+    mywcs = wcs.WCS(header)
+    specwcs = mywcs.sub([wcs.WCSSUB_SPECTRAL])
+    return specwcs.wcs_pix2world(np.arange(header['NAXIS{0}'.format(mywcs.wcs.spec+1)]), 0)
 
 def generate_table(data_cube, axis, indices):
     """
@@ -83,7 +80,8 @@ def make_table(region, maskfile, linelist):
         hdu.close()
         cube = np.squeeze(cube)
         # Generate the velocity axis
-        axis = get_axis(cubehead)/1000.0 # km/s
+        axis = get_axis(cubehead)
+        axis = axis[0]/1000.0 # km/s 
 
         # Retrieve all the structure ids from the mask
         structids = list(set(mask[mask >= 0.0]))
