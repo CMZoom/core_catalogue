@@ -83,7 +83,7 @@ def make_table(region, maskfile, linelist):
         cube = np.squeeze(cube)
         # Generate the velocity axis
         axis = get_axis(cubehead)
-        axis = axis[0]/1000.0 # km/s 
+        axis = axis[0]/1000.0 # km/s
 
         # Retrieve all the structure ids from the mask
         structids = list(set(mask[mask >= 0.0]))
