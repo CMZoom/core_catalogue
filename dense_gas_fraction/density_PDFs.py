@@ -17,6 +17,22 @@ import aplpy
 column_file=path+'column_properunits_conv36_source_only_OVERSAMPLED_with_G0.489+0.010_objmask_SELF_REGRIDDED.fits'
 columnlist=fits.open(column_file)
 column=columnlist[0].data
+
+source='G0.489+0.010'
+sma_list=fits.open(path+source+'.continuum.clean_REGRIDDED_with_G0.489+0.010_objmask_SELF_REGRIDDED.fits')
+sma_orig=sma_list[0].data
+smamask=sma_orig
+smamask[np.isfinite(smamask)]=1
+smamask[np.isnan(smamask)]=0
+
+#multiply column map with SMA mask, so only get N(H2) values
+# where there is also SMA data
+column=column*smamask
+#make all 0s nans, otherwise have problems with histograms
+column[column==0]=np.nan
+columnlist[0].data=column
+columnlist.writeto(path+source+'test.fits',clobber=True)
+
 column_flat=column.flatten()
 colmin=np.nanmin(column_flat)
 colmax=np.nanmax(column_flat)
@@ -70,7 +86,8 @@ G0489=get_col_inmask(source)
 # Visually inspect mask on the Herschel file with the mask as a contour
 plt.style.use('seaborn-colorblind')
 plt.rcParams.update({'font.size': 16}) #set fontsize
-fig=aplpy.FITSFigure(column_file)
+#fig=aplpy.FITSFigure(column_file)
+fig=aplpy.FITSFigure(path+source+'test.fits')
 #fig.recenter(0.5,0.0, width=2.8, height=1.0)
 #fig.recenter(0.49,0.008, width=0.1, height=0.05)
 #fig.show_colorscale(cmap=cm.inferno, vmin=1e+22,vmax=1e+23)
