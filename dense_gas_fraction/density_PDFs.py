@@ -5,7 +5,7 @@
 
 # User, update your path for the location of your files locally.
 path='/Users/battersby/Work/cmz/cmzoom_catalog_files/'
-
+# test
 # packages
 from astropy.io import fits
 import numpy as np
@@ -14,12 +14,18 @@ import aplpy
 
 # Read the Herschel column density file
 #column_file=path+'column_properunits_conv36_source_only.fits'
-column_file=path+'column_properunits_conv36_source_only_OVERSAMPLED_with_G0.489+0.010_objmask_SELF_REGRIDDED.fits'
+#column_file=path+'column_properunits_conv36_source_only_OVERSAMPLED_with_G0.489+0.010_objmask_SELF_REGRIDDED.fits'
+source='G0.489+0.010'
+#source='G1.602+0.018'
+#source='G359.889-0.093'
+sma_list=fits.open(path+source+'.continuum.clean_REGRIDDED_with_G0.489+0.010_objmask_SELF_REGRIDDED.fits')
+#sma_list=fits.open(path+source+'.continuum.clean_SELF_REGRIDDED.fits') 
+
+column_file=path+'column_properunits_conv36_source_only_OVERSAMPLED_with_'+source+'_objmask_SELF_REGRIDDED.fits'
 columnlist=fits.open(column_file)
 column=columnlist[0].data
 
-source='G0.489+0.010'
-sma_list=fits.open(path+source+'.continuum.clean_REGRIDDED_with_G0.489+0.010_objmask_SELF_REGRIDDED.fits')
+
 sma_orig=sma_list[0].data
 smamask=sma_orig
 smamask[np.isfinite(smamask)]=1
@@ -80,8 +86,9 @@ def get_col_inmask(source):
 #source='G1.602+0.018'
 #G1602=get_col_inmask(source)
 
-source='G0.489+0.010'
-G0489=get_col_inmask(source)
+#source='G0.489+0.010'
+#sourcecol=get_col_inmask(source)
+sourcecol=get_col_inmask(source)
 
 # Visually inspect mask on the Herschel file with the mask as a contour
 plt.style.use('seaborn-colorblind')
@@ -99,9 +106,9 @@ fig.set_theme('publication')
 fig.set_tick_labels_format(xformat='ddd.d', yformat='dd.d')
 # Plot contour of mask ...
 #fig.show_contour(G1602[1],linewidths='1',colors='cyan',levels=[0])
-fig.show_contour(G0489[1],linewidths='1',color='C0',levels=[0])
-#fig.show_contour(G0489[1],linewidths='1',colors='magenta',levels=[0])
-plt.savefig(path+source+'_cloud_dendro_img.eps', format='eps', dpi=100, bbox_inches='tight')
+fig.show_contour(sourcecol[1],linewidths='1',color='C0',levels=[0])
+#fig.show_contour(sourcecol[1],linewidths='1',colors='magenta',levels=[0])
+plt.savefig(path+source+'_cloud_dendro_img.pdf', format='pdf', dpi=100, bbox_inches='tight')
 
 plt.show()
 
@@ -115,9 +122,9 @@ plt.xlabel('Column Density N(H$_2$) [cm$^{-2}$]')
 #bins = np.logspace(22.9,23.9,100)
 bins = np.logspace(np.log10(colmin),np.log10(colmax),100)
 plt.hist(column_flat, bins, color='gray',alpha=0.7, log='True', label='Full cloud (oversampled): '+source)
-plt.hist(G0489[3], bins,alpha=0.7, log='True', label='Dendrogram leaves: '+source)
+plt.hist(sourcecol[3], bins,alpha=0.7, log='True', label='Dendrogram leaves: '+source)
 #plt.hist(G1602[3], bins, color='C0',alpha=0.7, log='True', label=source)
-#plt.hist(G0489[3], bins, color='magenta', alpha=0.7, log='True', label=source)
+#plt.hist(sourcecol[3], bins, color='magenta', alpha=0.7, log='True', label=source)
 
 
 #plt.hist(dendro,bins, color='cyan', alpha=0.7, log='True', label='Dendrogram Sources')
@@ -133,7 +140,7 @@ legend = plt.legend(loc='upper left', shadow=False, fontsize=18)#'x-large')
 
 # Save figure
 # Need to save it as a PDF, otherewise, lose transparency
-plt.savefig(G0489[2],format='pdf', dpi=100, bbox_inches='tight')
+plt.savefig(sourcecol[2],format='pdf', dpi=100, bbox_inches='tight')
 
 plt.show()
 
