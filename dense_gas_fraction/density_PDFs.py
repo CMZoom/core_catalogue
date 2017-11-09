@@ -3,8 +3,7 @@
 # Highlight the pixels that overlap with SMA cores
 # from the dendrogram core catalog
 
-# User, update your path for the location of your files locally.
-path='/Users/battersby/Work/cmz/cmzoom_catalog_files/'
+import os
 # test
 # packages
 from astropy.io import fits
@@ -12,21 +11,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 import aplpy
 
-# Read the Herschel column density file
-#column_file=path+'column_properunits_conv36_source_only.fits'
-#column_file=path+'column_properunits_conv36_source_only_OVERSAMPLED_with_G0.489+0.010_objmask_SELF_REGRIDDED.fits'
-source='G0.489+0.010'
-#source='G1.602+0.018'
-#source='G359.889-0.093'
-sma_list=fits.open(path+source+'.continuum.clean_REGRIDDED_with_G0.489+0.010_objmask_SELF_REGRIDDED.fits')
-#sma_list=fits.open(path+source+'.continuum.clean_SELF_REGRIDDED.fits')
-
-column_file=path+'column_properunits_conv36_source_only_OVERSAMPLED_with_'+source+'_objmask_SELF_REGRIDDED.fits'
-columnlist=fits.open(column_file)
-column=columnlist[0].data
+sma_path = os.path.expanduser('~/Dropbox/SMA_CMZ/CMZoom_Images/November17_continuum_files/')
+herschel_path = os.path.expanduser('~/Dropbox/SMA_CMZ_FITS_files/')
 
 
-sma_orig=sma_list[0].data
+sma_mosaic = fits.open(sma_path+'mosaic.fits')
+
+column_file = herschel_path+'column_properunits_conv36_source_only.fits'
+columnlist = fits.open(column_file)
+column = columnlist[0].data
+
+sma_orig = sma_mosaic[0].data
 smamask = np.isfinite(sma_orig)
 
 #multiply column map with SMA mask, so only get N(H2) values
@@ -35,7 +30,7 @@ column = column*smamask
 #make all 0s nans, otherwise have problems with histograms
 column[column==0]=np.nan
 columnlist[0].data = column
-columnlist.writeto(path+source+'test.fits',clobber=True)
+#columnlist.writeto(path+source+'test.fits',clobber=True)
 
 column_flat=column.flatten()
 colmin=np.nanmin(column_flat)
@@ -45,13 +40,6 @@ print('colmax:', colmax)
 
 # Read SMA data file, make mask, multiply by column map and output an array
 def get_col_inmask(source):
-
-        # Assumes a certain filename convention, edit here as needed
-        #SMA_file=path+source+'.continuum.clean_regridded.fits'
-        SMA_file=path+source+'_objmask_SELF_REGRIDDED.fits'
-        mask_file=path+source+'_mask.fits'
-        hist_file=path+source+'_histogram.pdf'
-
         # Read the SMA data file
         # Already regridded and projected to have identical file to the
         # target above in CASA, info in README about this
@@ -62,8 +50,8 @@ def get_col_inmask(source):
         mask = np.isfinite(smadat)
 
         # Write mask to fits file
-        masklist = fits.PrimaryHDU(data=mask, header=columnlist[0].header)
-        masklist.writeto(mask_file, overwrite=True)
+        # masklist = fits.PrimaryHDU(data=mask, header=columnlist[0].header)
+        # masklist.writeto(mask_file, overwrite=True)
 
         # Apply mask to Herschel data
         column_wmask = column*mask
@@ -78,7 +66,7 @@ def get_col_inmask(source):
 
 #source='G0.489+0.010'
 #sourcecol=get_col_inmask(source)
-sourcecol=get_col_inmask(source)
+sourcecol = get_col_inmask(source)
 
 # Visually inspect mask on the Herschel file with the mask as a contour
 plt.style.use('seaborn-colorblind')
