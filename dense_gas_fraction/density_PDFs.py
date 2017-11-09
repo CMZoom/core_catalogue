@@ -1,7 +1,7 @@
-# Create mask of SMA footprint, apply to Herschel data, 
+# Create mask of SMA footprint, apply to Herschel data,
 # derive PDF of enclosed Herschel data.
 # Highlight the pixels that overlap with SMA cores
-# from the dendrogram core catalog  
+# from the dendrogram core catalog
 
 # User, update your path for the location of your files locally.
 path='/Users/battersby/Work/cmz/cmzoom_catalog_files/'
@@ -19,7 +19,7 @@ source='G0.489+0.010'
 #source='G1.602+0.018'
 #source='G359.889-0.093'
 sma_list=fits.open(path+source+'.continuum.clean_REGRIDDED_with_G0.489+0.010_objmask_SELF_REGRIDDED.fits')
-#sma_list=fits.open(path+source+'.continuum.clean_SELF_REGRIDDED.fits') 
+#sma_list=fits.open(path+source+'.continuum.clean_SELF_REGRIDDED.fits')
 
 column_file=path+'column_properunits_conv36_source_only_OVERSAMPLED_with_'+source+'_objmask_SELF_REGRIDDED.fits'
 columnlist=fits.open(column_file)
@@ -27,60 +27,58 @@ column=columnlist[0].data
 
 
 sma_orig=sma_list[0].data
-smamask=sma_orig
-smamask[np.isfinite(smamask)]=1
-smamask[np.isnan(smamask)]=0
+smamask = np.isfinite(sma_orig)
 
 #multiply column map with SMA mask, so only get N(H2) values
 # where there is also SMA data
-column=column*smamask
+column = column*smamask
 #make all 0s nans, otherwise have problems with histograms
 column[column==0]=np.nan
-columnlist[0].data=column
+columnlist[0].data = column
 columnlist.writeto(path+source+'test.fits',clobber=True)
 
 column_flat=column.flatten()
 colmin=np.nanmin(column_flat)
 colmax=np.nanmax(column_flat)
-print 'colmin:', colmin
-print 'colmax:', colmax
+print('colmin:', colmin)
+print('colmax:', colmax)
 
 # Read SMA data file, make mask, multiply by column map and output an array
 def get_col_inmask(source):
-	
-	# Assumes a certain filename convention, edit here as needed
-	#SMA_file=path+source+'.continuum.clean_regridded.fits'
-	SMA_file=path+source+'_objmask_SELF_REGRIDDED.fits'
-	mask_file=path+source+'_mask.fits'
-	hist_file=path+source+'_histogram.pdf'
-	
-	# Read the SMA data file
-	# Already regridded and projected to have identical file to the
-	# target above in CASA, info in README about this
-	smalist=fits.open(SMA_file)
-	smadat=smalist[0].data
 
-	# Create mask
-	mask=smadat
-	mask[np.isfinite(mask)]=1
-	mask[np.isnan(mask)]=0
+        # Assumes a certain filename convention, edit here as needed
+        #SMA_file=path+source+'.continuum.clean_regridded.fits'
+        SMA_file=path+source+'_objmask_SELF_REGRIDDED.fits'
+        mask_file=path+source+'_mask.fits'
+        hist_file=path+source+'_histogram.pdf'
 
-	# Write mask to fits file
-	# There must be a better / easier way to write a new data file to
-	# a FITS file using its header... but I don't know what it is!!
-	masklist=columnlist 
-	masklist[0].data=mask
-	masklist.writeto(mask_file, clobber=True)
+        # Read the SMA data file
+        # Already regridded and projected to have identical file to the
+        # target above in CASA, info in README about this
+        smalist=fits.open(SMA_file)
+        smadat=smalist[0].data
 
-	# Apply mask to Herschel data
-	column_wmask=column*mask
-	column_mask_flat = column_wmask.flatten()
-	
-	# Save all the things you need together 
-	# OMG, definitely a better way to do this!!
-	a=(source,mask_file,hist_file,column_mask_flat)
- 
-	return a
+        # Create mask
+        mask=smadat
+        mask[np.isfinite(mask)]=1
+        mask[np.isnan(mask)]=0
+
+        # Write mask to fits file
+        # There must be a better / easier way to write a new data file to
+        # a FITS file using its header... but I don't know what it is!!
+        masklist=columnlist
+        masklist[0].data=mask
+        masklist.writeto(mask_file, clobber=True)
+
+        # Apply mask to Herschel data
+        column_wmask=column*mask
+        column_mask_flat = column_wmask.flatten()
+
+        # Save all the things you need together
+        # OMG, definitely a better way to do this!!
+        a=(source,mask_file,hist_file,column_mask_flat)
+
+        return a
 
 #assumes a filename convention of 'source.continuum.clean.fits'
 #source='G1.602+0.018'
@@ -143,15 +141,3 @@ legend = plt.legend(loc='upper left', shadow=False, fontsize=18)#'x-large')
 plt.savefig(sourcecol[2],format='pdf', dpi=100, bbox_inches='tight')
 
 plt.show()
-
-
-
-
-
-####
-
-
-
-
-
-

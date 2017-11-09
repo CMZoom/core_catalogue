@@ -14,7 +14,7 @@ import os
 try:
     from casa import casac
 except ImportError, e:
-    print "Failed to load Casa: \n"
+    print("Failed to load Casa: \n")
     exit(1)
 
 '''
@@ -45,5 +45,4 @@ exportfits(imagename='original_regridded.image',fitsimage=outputFITS,overwrite=T
 #delete image file artifacts to clear space
 os.system("rm -R *.image")
 
-print "Regridding complete!"
-
+print("Regridding complete!")
