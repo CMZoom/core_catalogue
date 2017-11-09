@@ -23,6 +23,12 @@ column_file = os.path.join(herschel_path, 'column_properunits_conv36_source_only
 # column density file handle
 column_fh = fits.open(column_file)
 
+temperature_file = os.path.join(herschel_path, 'temp_conv36_source_only.fits')
+# temperature density file handle
+temperature_fh = fits.open(temperature_file)
+
+assert temperature_fh[0].data.shape == column_fh[0].data.shape
+
 
 sma_file = os.path.join(sma_path, 'mosaic.fits')
 sma_mosaic = fits.open(sma_file)
@@ -40,6 +46,8 @@ catalog = Table.read(os.path.join(catalog_path, 'mosaic_Nov2017_pruned_v1_datata
 colwcs = wcs.WCS(column_fh[0].header)
 pix = colwcs.wcs_world2pix(catalog['GLON'], catalog['GLAT'], 0)
 column_dens = column_fh[0].data[pix[1].astype('int'), pix[0].astype('int')]
+temperature = temperature_fh[0].data[pix[1].astype('int'), pix[0].astype('int')]
+catalog.add_column(Column(name='DustTemperature', data=temperature))
 catalog.add_column(Column(name='ColumnDensity', data=column_dens))
 catalog.write(os.path.join(catalog_path,
                            'mosaic_Nov2017_Jy_per_Ster_pruned_datab_with_ColumnDensity.fits'),
