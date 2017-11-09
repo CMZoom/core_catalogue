@@ -59,26 +59,18 @@ def get_col_inmask(source):
         smadat=smalist[0].data
 
         # Create mask
-        mask=smadat
-        mask[np.isfinite(mask)]=1
-        mask[np.isnan(mask)]=0
+        mask = np.isfinite(smadat)
 
         # Write mask to fits file
-        # There must be a better / easier way to write a new data file to
-        # a FITS file using its header... but I don't know what it is!!
-        masklist=columnlist
-        masklist[0].data=mask
-        masklist.writeto(mask_file, clobber=True)
+        masklist = fits.PrimaryHDU(data=mask, header=columnlist[0].header)
+        masklist.writeto(mask_file, overwrite=True)
 
         # Apply mask to Herschel data
-        column_wmask=column*mask
+        column_wmask = column*mask
         column_mask_flat = column_wmask.flatten()
 
         # Save all the things you need together
-        # OMG, definitely a better way to do this!!
-        a=(source,mask_file,hist_file,column_mask_flat)
-
-        return a
+        return source, mask_file, hist_file, column_mask_flat
 
 #assumes a filename convention of 'source.continuum.clean.fits'
 #source='G1.602+0.018'
