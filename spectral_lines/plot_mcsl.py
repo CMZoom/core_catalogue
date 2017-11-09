@@ -10,7 +10,7 @@ from matplotlib.pyplot import cm
 
 # Import the table containing the spatially-averaged spectra
 
-table_dir = "/Users/Jonathan/Dropbox/Work/CMZ/CMZ_SMA/output_spec/"
+table_dir = "./tables/"
 region = "G0.489+0.010"
 linelist = ['C18O']
 
@@ -28,9 +28,9 @@ structure_to_plot = indices[0] # change this number
 x_axis = np.array([val for val in table['Velocity']])
 y_axis = np.array([val for val in table[str(structure_to_plot)]])
 
-stddev_y_axis = np.std(y_axis)
-miny = np.min(y_axis)-stddev_y_axis
-maxy = np.max(y_axis)+stddev_y_axis
+stddev_y_axis = np.std(y_axis[(y_axis != np.nan)])
+miny = np.nanmin(y_axis)-stddev_y_axis
+maxy = np.nanmax(y_axis)+stddev_y_axis
 
 # Plotting
 fig   = plt.figure(figsize=( 8.0, 8.0))
@@ -54,8 +54,8 @@ if len(indices) > 1.0:
         y_axis = np.array([val for val in table[str(structure_to_plot)]])
         # Calculate the y range - set the ylimits to their maximum values
         stddev_y_axis = np.std(y_axis)
-        _miny = np.min(y_axis)-stddev_y_axis
-        _maxy = np.max(y_axis)+stddev_y_axis
+        _miny = np.nanmin(y_axis)-stddev_y_axis
+        _maxy = np.nanmax(y_axis)+stddev_y_axis
         if _miny < miny:
             miny = _miny
         if _maxy > maxy:

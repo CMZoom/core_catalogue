@@ -10,7 +10,7 @@ from astropy.table import Table
 
 # User needs to input the name of the region and the name of the mask
 region = 'G0.489+0.010'
-mask = 'G0.489+0.010_objmask.fits'
+mask = './masks/G0.489+0.010_objmask.fits'
 
 # User should input a list of lines - a table will be generated for each line.
 linelist = ['C18O']
