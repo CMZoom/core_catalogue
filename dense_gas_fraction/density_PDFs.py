@@ -35,14 +35,14 @@ smaobserved_projto_herschel,_ = reproject.reproject_interp((sma_observed,
 smaobserved_projto_herschel[np.isnan(smaobserved_projto_herschel)] = 0
 smaobserved_projto_herschel = smaobserved_projto_herschel.astype('bool')
 
-catalog = Table.read(os.path.join(catalog_path, 'mosaic_Nov2017_Jy_per_Ster.fits_datatab.fits'))
+catalog = Table.read(os.path.join(catalog_path, 'mosaic_Nov2017_pruned_v1_datatab.fits'))
 
 colwcs = wcs.WCS(column_fh[0].header)
 pix = colwcs.wcs_world2pix(catalog['GLON'], catalog['GLAT'], 0)
 column_dens = column_fh[0].data[pix[1].astype('int'), pix[0].astype('int')]
 catalog.add_column(Column(name='ColumnDensity', data=column_dens))
 catalog.write(os.path.join(catalog_path,
-                           'mosaic_Nov2017_Jy_per_Ster_datab_with_ColumnDensity.fits'),
+                           'mosaic_Nov2017_Jy_per_Ster_pruned_datab_with_ColumnDensity.fits'),
               overwrite=True)
 
 column_masked = column_fh[0].data
@@ -63,10 +63,12 @@ yy,xx = np.indices([npix*2]*2, dtype='float')
 rad = ((yy-npix)**2 + (xx-npix)**2)**0.5
 radmask = rad < herschel_beamsize_pixels
 
-for row,(cx,cy) in ProgressBar(zip(catalog, zip(*pix))):
+pb = ProgressBar(len(catalog))
+for row,(cx,cy) in zip(catalog, zip(*pix)):
     cy = int(np.round(cy))
     cx = int(np.round(cx))
     smasourcemask[cy-npix:cy+npix,cx-npix:cx+npix][radmask] = True
+    pb.update()
 
 
 
@@ -83,30 +85,39 @@ fig.set_theme('publication')
 #fig.set_tick_labels_format(xformat='ddd.d', yformat='dd.d')
 
 # Plot contour of mask ...
-fig.show_contour(smaobserved_projto_herschel, linewidths=[1], color='C0',
-                 levels=[0])
+fig.show_contour(smaobserved_projto_herschel.astype('int'), linewidths=[1],
+                 colors=['b'], levels=[0])
+
+fig.show_contour(smasourcemask.astype('int'), linewidths=[1],
+                 colors=['r'], levels=[0])
+
+fig.recenter(0,0,width=2,height=0.75)
+
 plt.savefig(os.path.join(figure_path, 'mask_on_herschelcolumn.pdf'),
             format='pdf', dpi=100, bbox_inches='tight')
 
 
 # Plot Histogram
 plt.rcParams.update({'font.size': 24}) #set fontsize
-histogram = plt.figure(1,figsize=(13,6))
-ax=histogram.gca()
+histfig = plt.figure(2,figsize=(13,6))
+ax = histfig.gca()
 plt.ylabel('Number of Pixels')
 plt.xlabel('Column Density N(H$_2$) [cm$^{-2}$]')
 
 #bins = np.logspace(22.9,23.9,100)
 bins = np.logspace(np.log10(colmin),np.log10(colmax),100)
-plt.hist(column_masked[np.isfinite(column_masked)], bins, color='gray',alpha=0.7, log='True', label='Full cloud (oversampled): '+source)
-plt.hist(sourcecol[3], bins,alpha=0.7, log='True', label='Dendrogram leaves: '+source)
+plt.hist(column_masked[np.isfinite(column_masked)], bins,
+         color='gray',alpha=0.7, log='True',
+         label='Full cloud')
+plt.hist(column_masked[smasourcemask & np.isfinite(column_masked)], bins, alpha=0.7, log='True',
+         label='SMA Sources')
 #plt.hist(G1602[3], bins, color='C0',alpha=0.7, log='True', label=source)
 #plt.hist(sourcecol[3], bins, color='magenta', alpha=0.7, log='True', label=source)
 
 
 #plt.hist(dendro,bins, color='cyan', alpha=0.7, log='True', label='Dendrogram Sources')
 
-plt.gca().set_xscale("log")
+ax.set_xscale("log")
 #ax.set_xlim(10**22.9, 10**23.9)
 ax.set_xlim(colmin, colmax)
 #ax.set_ylim(1,200)
@@ -117,6 +128,7 @@ legend = plt.legend(loc='upper left', shadow=False, fontsize=18)#'x-large')
 
 # Save figure
 # Need to save it as a PDF, otherewise, lose transparency
-plt.savefig(sourcecol[2],format='pdf', dpi=100, bbox_inches='tight')
+plt.savefig(os.path.join(figure_path, 'column_histograms.pdf'),format='pdf',
+            dpi=100, bbox_inches='tight')
 
 plt.show()
