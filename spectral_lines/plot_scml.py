@@ -11,7 +11,7 @@ from matplotlib.pyplot import cm
 
 # Import the table containing the spatially-averaged spectra
 
-table_dir = "/Users/Jonathan/Dropbox/Work/CMZ/CMZ_SMA/output_spec/"
+table_dir = "./tables/"
 region = "G0.489+0.010"
 linelist = ['C18O', 'C18O']
 
