@@ -4,25 +4,28 @@
 # from the dendrogram core catalog
 
 import os
-# test
-# packages
 from astropy.io import fits
+from astropy.table import Table
 import numpy as np
 import matplotlib.pyplot as plt
 import aplpy
 
 sma_path = os.path.expanduser('~/Dropbox/SMA_CMZ/CMZoom_Images/November17_continuum_files/')
 herschel_path = os.path.expanduser('~/Dropbox/SMA_CMZ_FITS_files/')
+catalog_path = os.path.expanduser('~/Dropbox/SMA_CMZ/prototype_catalog/')
+figure_path = os.path.expanduser('~/Dropbox/SMA_CMZ/figures/catalog/')
 
-
-sma_mosaic = fits.open(sma_path+'mosaic.fits')
-
-column_file = herschel_path+'column_properunits_conv36_source_only.fits'
+column_file = os.path.join(herschel_path, 'column_properunits_conv36_source_only.fits')
 columnlist = fits.open(column_file)
 column = columnlist[0].data
 
+
+sma_file = os.path.join(sma_path, 'mosaic.fits')
+sma_mosaic = fits.open(sma_file)
 sma_orig = sma_mosaic[0].data
 smamask = np.isfinite(sma_orig)
+
+catalog = Table.read(os.path.join(catalog_path, 'mosaic_Nov2017_Jy_per_Ster.fits_datatab.fits'))
 
 #multiply column map with SMA mask, so only get N(H2) values
 # where there is also SMA data
@@ -35,60 +38,24 @@ columnlist[0].data = column
 column_flat=column.flatten()
 colmin=np.nanmin(column_flat)
 colmax=np.nanmax(column_flat)
-print('colmin:', colmin)
-print('colmax:', colmax)
-
-# Read SMA data file, make mask, multiply by column map and output an array
-def get_col_inmask(source):
-        # Read the SMA data file
-        # Already regridded and projected to have identical file to the
-        # target above in CASA, info in README about this
-        smalist=fits.open(SMA_file)
-        smadat=smalist[0].data
-
-        # Create mask
-        mask = np.isfinite(smadat)
-
-        # Write mask to fits file
-        # masklist = fits.PrimaryHDU(data=mask, header=columnlist[0].header)
-        # masklist.writeto(mask_file, overwrite=True)
-
-        # Apply mask to Herschel data
-        column_wmask = column*mask
-        column_mask_flat = column_wmask.flatten()
-
-        # Save all the things you need together
-        return source, mask_file, hist_file, column_mask_flat
-
-#assumes a filename convention of 'source.continuum.clean.fits'
-#source='G1.602+0.018'
-#G1602=get_col_inmask(source)
-
-#source='G0.489+0.010'
-#sourcecol=get_col_inmask(source)
-sourcecol = get_col_inmask(source)
 
 # Visually inspect mask on the Herschel file with the mask as a contour
 plt.style.use('seaborn-colorblind')
 plt.rcParams.update({'font.size': 16}) #set fontsize
-#fig=aplpy.FITSFigure(column_file)
-fig=aplpy.FITSFigure(path+source+'test.fits')
-#fig.recenter(0.5,0.0, width=2.8, height=1.0)
-#fig.recenter(0.49,0.008, width=0.1, height=0.05)
-#fig.show_colorscale(cmap=cm.inferno, vmin=1e+22,vmax=1e+23)
-#fig.show_colorscale(cmap='Greys_r',vmin=5e+22,vmax=5e+23)
+
+fig = aplpy.FITSFigure(column_file)
+
 fig.show_colorscale(cmap='Greys_r',vmin=colmin,vmax=colmax)
 fig.show_colorbar()
 fig.colorbar.set_width(0.3)
 fig.set_theme('publication')
 fig.set_tick_labels_format(xformat='ddd.d', yformat='dd.d')
-# Plot contour of mask ...
-#fig.show_contour(G1602[1],linewidths='1',colors='cyan',levels=[0])
-fig.show_contour(sourcecol[1],linewidths='1',color='C0',levels=[0])
-#fig.show_contour(sourcecol[1],linewidths='1',colors='magenta',levels=[0])
-plt.savefig(path+source+'_cloud_dendro_img.pdf', format='pdf', dpi=100, bbox_inches='tight')
 
-plt.show()
+# Plot contour of mask ...
+fig.show_contour(smamask,linewidths=[1],color='C0',levels=[0])
+plt.savefig(os.path.join(figure_path, 'mask_on_herschelcolumn.pdf'),
+            format='pdf', dpi=100, bbox_inches='tight')
+
 
 # Plot Histogram
 plt.rcParams.update({'font.size': 24}) #set fontsize
