@@ -37,13 +37,17 @@ def get_flux(cube, indices):
     Get the spatially-averaged flux over the current structure.
     """
     # Split out the x, y indices individually
-    idx = indices[0,:]
-    idy = indices[1,:]
+    #idx = indices[0,:]
+    #idy = indices[1,:]
     # derive spatially-averaged flux per channel
-    flux = np.zeros(len(cube[:,0,0]))
-    for i in range(len(cube[:,0,0])):
-        flux[i] = np.sum(cube[i, idx, idy])
-    flux = flux/np.size(indices[0,:])
+    #flux = np.zeros(cube.shape[0])
+    #for i in range(len(cube[:,0,0])):
+    #    flux[i] = np.sum(cube[i, idx, idy])
+    #flux = flux/np.size(indices[0,:])
+    
+    # This should be tested; I don't know if indices are forced to a useful shape
+    # based on get_indices, though, I think it should work.
+    flux = cube[:, indices[0,:], indices[1,:]].mean(axis=(1,2))
     return flux
 
 def make_table(region, maskfile, linelist):
@@ -101,5 +105,3 @@ def make_table(region, maskfile, linelist):
 
         # Write the table to the current directory
         table.write(outfile, format='fits', overwrite=True)
-
-    return
