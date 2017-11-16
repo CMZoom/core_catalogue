@@ -15,10 +15,10 @@ import matplotlib.pyplot as plt
 import aplpy
 import pyregion
 
-sma_path = os.path.expanduser('~/Dropbox/SMA_CMZ/CMZoom_Images/November17_continuum_fits/')
-herschel_path = os.path.expanduser('~/Dropbox/SMA_CMZ_FITS_files/')
-catalog_path = os.path.expanduser('~/Dropbox/SMA_CMZ/prototype_catalog/')
-figure_path = os.path.expanduser('~/Dropbox/SMA_CMZ/figures/catalog/')
+sma_path = os.path.expanduser('~/Dropbox/CMZoom_Data/continuum_images/')
+herschel_path = os.path.expanduser('~/Dropbox/CMZoom_Data_FITS_files/')
+catalog_path = os.path.expanduser('~/Dropbox/CMZoom_Data/prototype_catalog/')
+figure_path = os.path.expanduser('~/Dropbox/CMZoom_Data/figures/catalog/')
 
 column_file = os.path.join(herschel_path, 'column_properunits_conv36_source_only.fits')
 # column density file handle
