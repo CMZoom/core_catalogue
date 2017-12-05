@@ -1,6 +1,7 @@
 import numpy as np
 import os
 from astropy.io import fits
+from astropy imports wcs
 from astrodendro import Dendrogram, pp_catalog
 from astrodendro.analysis import PPStatistic
 from astropy.table import Table
@@ -120,6 +121,15 @@ def planck_wave( Wave, Temp ):
 table = Table(meta={'name': 'Leaf Properties'})
 headings = ['index', 'mass', 'N', 'Sigma', 'n', 'rho', 'tff']
 description = ['', 'g2d=100, beta=1.75', 'beta=1.75, mu=2.8', '', '', '', '']
+
+# Update the table with Herschel-derived temperature
+fh = fits.open(os.path.expanduser('~/Dropbox/SMA_CMZ/gcmosaic_temp_conv25.fits'))
+hwcs = wcs.WCS(fh[0].header)
+for row in catalog:
+    # TODO: check this; I'm not sure if x_cen/y_cen are in the appropriate coordinate system
+    xpix,ypix = map(int, map(np.round, hwcs.wcs_world2pix(catalog['x_cen'], catalog['y_cen'], 0)[0]))
+    row['DustTemperature'] = fh[0].data[ypix, xpix]
+
 
 # physical Properties
 
