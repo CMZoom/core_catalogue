@@ -1,7 +1,7 @@
 import numpy as np
 import os
 from astropy.io import fits
-from astropy imports wcs
+from astropy import wcs
 from astrodendro import Dendrogram, pp_catalog
 from astrodendro.analysis import PPStatistic
 from astropy.table import Table
