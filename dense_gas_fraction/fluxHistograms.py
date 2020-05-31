@@ -35,16 +35,7 @@ print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
 ###   function used to build mask:
 def buildMask(imageData1):
-    maskImage = imageData1[0,0,:,:]
-    for pix2 in range(imageData1[0,0,0,:].size):
-        for pix1 in range(imageData1[0,0,:,0].size):
-            pixel = imageData1[0,0,pix1,pix2]
-            if math.isnan(pixel):
-                maskImage[pix1,pix2] = 0
-            else:
-                maskImage[pix1,pix2] = 1
-    #plt.imshow(maskImage)
-    return maskImage
+    return ~np.isnan(imageData1[0,0,:,:])
 
 ###   multiply image by mask
 def applyMask(maskImage, imageData2):
